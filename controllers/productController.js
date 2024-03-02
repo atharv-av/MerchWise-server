@@ -1,13 +1,20 @@
 const Product = require("../models/productModel");
 
+// TODO - Catch async errors
+
 // Create Product -- Admin
 exports.createProduct = async (req, res, next) => {
-  const product = await Product.create(req.body);
-  res.status(201).json({
-    success: true,
-    product,
-  });
+  try {
+    const product = await Product.create(req.body);
+    res.status(201).json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
+
 
 // List Products
 exports.getAllProducts = async (req, res) => {
@@ -68,7 +75,6 @@ exports.deleteProduct = async (req, res, next) => {
   }
 };
 
-
 // Get Product By Id
 exports.getSingleProduct = async (req, res, next) => {
   const product = await Product.findById(req.params.id);
@@ -76,7 +82,7 @@ exports.getSingleProduct = async (req, res, next) => {
   if (!product) {
     return res.status(404).json({
       success: false,
-      message: "No product found",
+      message: "Product not found",
     });
   }
 
