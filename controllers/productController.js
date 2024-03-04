@@ -1,4 +1,5 @@
 const Product = require("../models/productModel");
+const ApiFeatures = require("../utils/apiFeatures");
 
 // TODO - Catch async errors
 
@@ -15,14 +16,24 @@ exports.createProduct = async (req, res, next) => {
   }
 };
 
-
 // List Products
 exports.getAllProducts = async (req, res) => {
-  const listProducts = await Product.find();
-  res.status(200).json({
-    success: true,
-    listProducts,
-  });
+  try {
+    const resultsPerPage = 4;
+    const productCount = await Product.countDocuments();
+    const apiFeature = new ApiFeatures(Product.find(), req.query)
+      .search()
+      .filter()
+      .pagination(resultsPerPage);
+    const listProducts = await apiFeature.query;
+    res.status(200).json({
+      success: true,
+      listProducts,
+      productCount,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // Update Product --  Admin
